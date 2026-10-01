@@ -2,6 +2,10 @@
 
 Aplikasi dan toolkit lengkap untuk membuat dan mendeploy smart contract Token TRC-20 di jaringan TRON (Nile Testnet maupun Mainnet).
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fadith92%2Ftron-token-deployer)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/adith92/tron-token-deployer)
+
+
 ## 📁 Struktur Folder
 ```text
 tron-token/
