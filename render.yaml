@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: tron-token-deployer
+    env: static
+    buildCommand: node compile.js
+    staticPublishPath: ./public

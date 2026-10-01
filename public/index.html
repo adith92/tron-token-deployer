@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRON Token Deployer - 1-Click TRC20 Creator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="background-glow glow-1"></div>
+  <div class="background-glow glow-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-group">
+        <div class="tron-badge">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+            <path d="M16 2L2 26.5L16 22L30 26.5L16 2Z" fill="#FF0018"/>
+            <path d="M16 2L2 26.5L16 17.5V2Z" fill="#E00015"/>
+            <path d="M16 17.5L2 26.5L16 22V17.5Z" fill="#C00012"/>
+            <path d="M16 17.5L30 26.5L16 22V17.5Z" fill="#FF3347"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="title">TRON TRC-20 Deployer</h1>
+          <p class="subtitle">Buat & Luncurkan Token TRC20 Anda dalam Sekali Klik</p>
+        </div>
+      </div>
+
+      <div class="wallet-bar">
+        <div id="networkBadge" class="network-badge disconnected">
+          <span class="dot"></span>
+          <span id="networkName">Wallet Belum Terkoneksi</span>
+        </div>
+        <button id="connectWalletBtn" class="btn btn-secondary">
+          🔌 Hubungkan TronLink
+        </button>
+      </div>
+    </header>
+
+    <!-- Wallet Info Bar (Visible when connected) -->
+    <div id="walletDetails" class="wallet-details hidden">
+      <div class="wallet-card">
+        <span class="label">Alamat Wallet:</span>
+        <span id="walletAddress" class="mono value">--</span>
+      </div>
+      <div class="wallet-card">
+        <span class="label">Saldo TRX:</span>
+        <span id="walletBalance" class="value highlight">-- TRX</span>
+      </div>
+      <div class="wallet-action">
+        <a id="faucetLink" href="https://nileex.io/join/getJoinPage" target="_blank" class="btn btn-sm btn-faucet">
+          🎁 Klaim TRX Nile Gratis
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="main-card">
+      <div class="card-header">
+        <h2>Konfigurasi Token Anda</h2>
+        <p class="card-desc">Tentukan identitas dan total suplai token yang ingin Anda buat di TRON.</p>
+      </div>
+
+      <form id="tokenForm" class="form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tokenName">Nama Token (Token Name)</label>
+            <input type="text" id="tokenName" placeholder="Contoh: Garuda Token" value="Garuda Token" required>
+            <span class="hint">Nama lengkap token Anda.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="tokenSymbol">Simbol Token (Ticker)</label>
+            <input type="text" id="tokenSymbol" placeholder="Contoh: GRD" value="GRD" maxlength="10" required>
+            <span class="hint">Singkatan atau simbol perdagangan (2–6 huruf).</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tokenDecimals">Desimal (Decimals)</label>
+            <select id="tokenDecimals">
+              <option value="6" selected>6 (Standar TRON / USDT)</option>
+              <option value="18">18 (Standar Ethereum)</option>
+            </select>
+            <span class="hint">Sebagian besar token di TRON menggunakan 6 desimal.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="tokenSupply">Total Suplai (Initial Supply)</label>
+            <input type="number" id="tokenSupply" placeholder="Contoh: 1000000" value="1000000" min="1" step="any" required>
+            <span class="hint">Jumlah token yang akan langsung masuk ke wallet Anda.</span>
+          </div>
+        </div>
+
+        <div class="summary-box">
+          <div class="summary-item">
+            <span>Standar Token:</span>
+            <strong class="highlight">TRC-20 (Solidity 0.8.20)</strong>
+          </div>
+          <div class="summary-item">
+            <span>Estimasi Biaya Deploy:</span>
+            <span>~10 - 25 TRX (Gratis di Nile Testnet)</span>
+          </div>
+          <div class="summary-item">
+            <span>Penerima Suplai:</span>
+            <span id="supplyReceiver" class="mono">Alamat Wallet Anda</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" id="deployBtn" class="btn btn-primary btn-large" disabled>
+            🚀 Deploy Token Sekarang
+          </button>
+        </div>
+      </form>
+
+      <!-- Deployment Status & Logs -->
+      <div id="statusSection" class="status-section hidden">
+        <div class="spinner-container" id="statusSpinner">
+          <div class="spinner"></div>
+        </div>
+        <div class="status-content">
+          <h3 id="statusTitle">Memproses Deployment...</h3>
+          <p id="statusMsg">Menyiapkan parameter transaksi smart contract...</p>
+        </div>
+      </div>
+
+      <!-- Success Result Card -->
+      <div id="successCard" class="success-card hidden">
+        <div class="success-header">
+          <span class="success-icon">🎉</span>
+          <div>
+            <h3>Selamat! Token Berhasil Dibuat di Jaringan TRON!</h3>
+            <p>Smart contract Anda telah resmi terverifikasi dan aktif di blockchain.</p>
+          </div>
+        </div>
+
+        <div class="result-details">
+          <div class="result-row">
+            <span class="result-label">Contract Address (Alamat Token):</span>
+            <div class="copy-box">
+              <input type="text" id="deployedAddress" readonly class="mono">
+              <button id="copyAddressBtn" class="btn btn-sm btn-outline">Salin</button>
+            </div>
+          </div>
+
+          <div class="result-row">
+            <span class="result-label">Transaction ID (Hash Transaksi):</span>
+            <div class="copy-box">
+              <input type="text" id="deployedTxId" readonly class="mono">
+              <button id="copyTxBtn" class="btn btn-sm btn-outline">Salin</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <a id="tronscanLink" href="#" target="_blank" class="btn btn-primary">
+            🔍 Buka di TronScan Explorer
+          </a>
+          <button id="watchAssetBtn" class="btn btn-secondary">
+            🦊 Tambahkan ke TronLink Wallet
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Guide -->
+    <footer class="footer-tips">
+      <div class="tip-card">
+        <h4>💡 Tips Uji Coba (Nile Testnet)</h4>
+        <p>Pastikan Anda telah beralih ke <strong>Nile Testnet</strong> di pengaturan TronLink. Jangan gunakan Mainnet sebelum token diuji coba.</p>
+      </div>
+      <div class="tip-card">
+        <h4>⚡ Mengapa Butuh TRX?</h4>
+        <p>TRON menggunakan <em>Bandwidth & Energy</em> untuk mengeksekusi smart contract. Di Nile Testnet, TRX dapat diklaim gratis setiap saat.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
